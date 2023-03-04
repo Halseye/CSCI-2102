@@ -63,7 +63,8 @@ public class Project2
     System.out.printf("%nMasked: %n");
     outputFileTable(masked);
     readTable();
-
+    //line feed
+    System.out.println("\n");
     //Close scanner object
     input.close();
     }
