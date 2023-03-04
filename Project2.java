@@ -3,7 +3,6 @@ import java.util.Random;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.lang.NumberFormatException;
 import java.util.InputMismatchException;
 /*Eric Halsey 
  * Due 3/3/2023
@@ -11,66 +10,62 @@ import java.util.InputMismatchException;
  * cells with positive values are replaced with 1 and cells with non-positive values are replaced
  * with 0.
  */
-public class Project2 
+public class Project2
 {
     /**
-   * The main method prompts the user to enter the number of rows and columns for the table, generates
-   * a random table of numbers, and outputs the original table and the masked table.
-   *
+   * The main method prompts the user to enter the number of rows and columns for the table,
+   * After validating the user's input for the number of rows and columns, the program generates a 2D array of integers using the loadTable method, 
+   * where each element of the array is a random integer between -49 and 49, inclusive. 
+   * The program then uses the getMask method to create a new 2D array called "masked,"
+   * where each element of the array is 1 if the corresponding element in the original array is positive, and 0 otherwise.
+   * The program then outputs both the original and the masked tables to the console and writes the masked table 
+   * to a file named "masked.txt" using the outputFileTable method. 
+   * Finally, the program reads the contents of the file "masked.txt" and outputs them to the console using the readTable method.
    * @param args the command line arguments
    */
-    public static void main(String[] args) throws FileNotFoundException, InputMismatchException
+    public static void main(String[] args) 
     {
+    // Declarations
+    Scanner input = new Scanner(System.in);
+    Random rand = new Random();
+    int rows = 1;
+    int columns = 1;
+    boolean validInput = false;
     
-        // Declarations
-        Scanner input = new Scanner(System.in);
-        Random rand = new Random();
-        int rows;
-        int columns;
-        rows = 1;
-        columns = 1;
-        boolean validInput = false;
 
-        while (!validInput)
-        {
-            try
-            {
-                // Get number of rows from user
-                System.out.printf("Enter number of rows (1-10): ");
+    // Prompt user for valid number of rows and columns
+    while (!validInput) {
+        try {
+            System.out.print("Enter number of rows (1-10): ");
+            rows = input.nextInt();
+            while (rows < 1 || rows > 10) {
+                System.out.print("Invalid input. Number of rows must be between 1 and 10 inclusive. Enter number of rows (1-10): ");
                 rows = input.nextInt();
-                    while (rows < 1 || rows > 10) 
-                        {
-                            System.out.printf("Invalid input. Number of rows must be between 1 and 10 inclusive. Enter number of rows (1-10): ");
-                            rows = input.nextInt();
-                        }
-                
-                // Get number of columns from user
-                System.out.printf("Enter number of columns (1-10): ");
-                columns = input.nextInt();
-                    while (columns < 1 || columns > 10) 
-                        {
-                            System.out.printf("Invalid input. Number of columns must be between 1 and 10 inclusive. Enter number of columns (1-10): ");
-                            columns = input.nextInt();
-                        }
-                validInput = true;
             }
 
-            catch(InputMismatchException Exception)
-                {
-                    System.out.println("Invalid input. Please enter an integer value.");
-                    input.nextLine();
-                }
+            System.out.print("Enter number of columns (1-10): ");
+            columns = input.nextInt();
+            while (columns < 1 || columns > 10) {
+                System.out.print("Invalid input. Number of columns must be between 1 and 10 inclusive. Enter number of columns (1-10): ");
+                columns = input.nextInt();
+            }
+
+            validInput = true;
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Please enter an integer value.");
+            input.nextLine(); // consume invalid input
         }
-        // Load table
-        int[][] table = loadTable(rows, columns, rand);
-        
-        // Output original table to masked.txt
-        outputTable(table);
-        
-        // Create and output masked table
-        int[][] mask = getMask(table);
-        System.out.printf("After:%n");
-        readTable(mask);
+    }
+    int[][] table = loadTable(rows, columns, rand);
+    int[][] masked = getMask(table);
+    System.out.printf("Unmasked:%n"); 
+    outputTable(table);
+    System.out.printf("%nMasked: %n");
+    outputFileTable(masked);
+    readTable();
+
+    //Close scanner object
+    input.close();
     }
 
 
@@ -135,6 +130,24 @@ public class Project2
    */
     public static void outputTable(int[][] table) 
     {
+    int rows = table.length;
+    int columns = table[0].length;
+        for (int i = 0; i < rows; i++) 
+        {
+        for (int j = 0; j < columns; j++) 
+        {
+            System.out.printf("%4d", table[i][j]);
+        }
+        System.out.println();
+        }
+    }
+
+    /**
+     * this method outputs the file to the masked.txt file
+     * @param table
+     */
+    public static void outputFileTable(int[][] table) 
+    {
         try
         {
             PrintWriter out = new PrintWriter("masked.txt");
@@ -157,8 +170,10 @@ public class Project2
         
         
     }
-    
-    public static void readTable(int[][] table)
+    /**
+     * This method reads the masked.txt file and outputs whatever is in it to the console
+     */
+    public static void readTable()
     {
         try
         {
@@ -169,11 +184,6 @@ public class Project2
             }
             scanner.close();
         } 
-
-        catch(NumberFormatException exception)
-        {
-            System.err.println("Error: " + exception.getMessage());
-        }
         catch (FileNotFoundException exception) 
         {
             System.err.println("Error: " + exception.getMessage());
